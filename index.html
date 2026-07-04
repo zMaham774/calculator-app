@@ -1,0 +1,168 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+    <title>Reckon - Precision Calculator</title>
+
+    <!-- Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+        href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600;700;800&family=Inter:wght@400;500;600;700&display=swap"
+        rel="stylesheet" />
+
+    <!-- Tailwind CDN -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/tailwindcss/3.4.1/tailwind.min.js"></script>
+
+    <!-- Lucide Icons -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/lucide-static/0.462.0/umd/lucide.min.js"></script>
+
+    <!-- GSAP -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script>
+
+    <!-- Motion (Framer Motion's vanilla JS lib) -->
+    <script src="https://cdn.jsdelivr.net/npm/motion@10.18.0/dist/motion.js"></script>
+
+    <!-- Math.js -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/mathjs/12.4.2/math.min.js"></script>
+
+    <link rel="stylesheet" href="styles.css" />
+</head>
+
+<body>
+
+    <div class="app-backdrop" aria-hidden="true">
+        <div class="grain"></div>
+        <div class="glow glow-a"></div>
+        <div class="glow glow-b"></div>
+    </div>
+
+    <main class="app-shell" id="appShell">
+
+        <!-- ============ CALCULATOR BODY ============ -->
+        <section class="calc-unit" id="calcUnit" aria-label="Calculator">
+
+            <!-- Top bar: brand + mode toggle -->
+            <header class="calc-topbar">
+                <div class="brand">
+                    <span class="brand-mark" aria-hidden="true"></span>
+                    <span class="brand-name">RECKON</span>
+                    <span class="brand-model">MODEL&nbsp;R-7</span>
+                </div>
+                <div class="topbar-controls">
+                    <button type="button" class="chip-btn" id="historyToggle" aria-expanded="false"
+                        aria-controls="historyTape" aria-label="Toggle calculation history">
+                        <i data-lucide="scroll-text" class="icon-sm"></i>
+                    </button>
+                    <button type="button" class="chip-btn" id="modeToggle" aria-pressed="false"
+                        aria-label="Toggle scientific mode">
+                        <i data-lucide="function-square" class="icon-sm"></i>
+                    </button>
+                </div>
+            </header>
+
+            <!-- History tape -->
+            <div class="history-tape" id="historyTape" aria-live="off">
+                <div class="history-tape-inner" id="historyList">
+                    <p class="history-empty">No calculations yet, your tape will print here.</p>
+                </div>
+            </div>
+
+            <!-- Display -->
+            <div class="display-unit" role="status" aria-live="polite" aria-atomic="true">
+                <div class="display-inset">
+                    <div class="expression-row" id="expressionRow">&nbsp;</div>
+                    <div class="result-row">
+                        <span id="resultDisplay" class="result-text" tabindex="0" aria-label="Current value">0</span>
+                    </div>
+                    <div class="display-meta">
+                        <span class="meta-tag" id="angleTag">DEG</span>
+                        <span class="meta-tag meta-tag-error" id="errorTag" hidden>ERR</span>
+                        <button type="button" class="copy-btn" id="copyBtn" aria-label="Copy result to clipboard">
+                            <i data-lucide="copy" class="icon-xs"></i>
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Keypad wrapper: scientific panel + standard grid -->
+            <div class="keypad-wrapper">
+
+                <!-- Scientific panel (collapsible) -->
+                <div class="sci-panel" id="sciPanel" aria-hidden="true">
+                    <div class="sci-grid">
+                        <button class="key key-sci" data-action="paren-open" aria-label="Open parenthesis">(</button>
+                        <button class="key key-sci" data-action="paren-close" aria-label="Close parenthesis">)</button>
+                        <button class="key key-sci" data-action="inv" id="invBtn" aria-pressed="false"
+                            aria-label="Inverse trig toggle">inv</button>
+                        <button class="key key-sci" data-action="angle" id="angleBtn"
+                            aria-label="Toggle degrees/radians">rad</button>
+
+                        <button class="key key-sci" data-func="sin" aria-label="Sine">sin</button>
+                        <button class="key key-sci" data-func="cos" aria-label="Cosine">cos</button>
+                        <button class="key key-sci" data-func="tan" aria-label="Tangent">tan</button>
+                        <button class="key key-sci" data-func="log" aria-label="Logarithm base 10">log</button>
+
+                        <button class="key key-sci" data-func="sqrt" aria-label="Square root">√x</button>
+                        <button class="key key-sci" data-func="cbrt" aria-label="Cube root">∛x</button>
+                        <button class="key key-sci" data-func="ln" aria-label="Natural logarithm">ln</button>
+                        <button class="key key-sci" data-action="pow" aria-label="Power">xʸ</button>
+
+                        <button class="key key-sci" data-func="square" aria-label="Square">x²</button>
+                        <button class="key key-sci" data-func="cube" aria-label="Cube">x³</button>
+                        <button class="key key-sci" data-func="exp" aria-label="Exponential e to the x">eˣ</button>
+                        <button class="key key-sci" data-action="mod" aria-label="Modulus">mod</button>
+
+                        <button class="key key-sci" data-func="factorial" aria-label="Factorial">x!</button>
+                        <button class="key key-sci" data-func="abs" aria-label="Absolute value">|x|</button>
+                        <button class="key key-sci" data-func="reciprocal"
+                            aria-label="Reciprocal one over x">1/x</button>
+                        <button class="key key-sci" data-action="pi" aria-label="Pi constant">π</button>
+                    </div>
+                </div>
+
+                <!-- Standard grid -->
+                <div class="std-grid">
+                    <button class="key key-func" data-action="clear" aria-label="Clear all">AC</button>
+                    <button class="key key-func" data-action="delete" aria-label="Delete last character">
+                        <i data-lucide="delete" class="icon-sm"></i>
+                    </button>
+                    <button class="key key-func" data-action="percent" aria-label="Percent">%</button>
+                    <button class="key key-op" data-op="÷" aria-label="Divide">÷</button>
+
+                    <button class="key key-digit" data-digit="7">7</button>
+                    <button class="key key-digit" data-digit="8">8</button>
+                    <button class="key key-digit" data-digit="9">9</button>
+                    <button class="key key-op" data-op="×" aria-label="Multiply">×</button>
+
+                    <button class="key key-digit" data-digit="4">4</button>
+                    <button class="key key-digit" data-digit="5">5</button>
+                    <button class="key key-digit" data-digit="6">6</button>
+                    <button class="key key-op" data-op="−" aria-label="Subtract">−</button>
+
+                    <button class="key key-digit" data-digit="1">1</button>
+                    <button class="key key-digit" data-digit="2">2</button>
+                    <button class="key key-digit" data-digit="3">3</button>
+                    <button class="key key-op" data-op="+" aria-label="Add">+</button>
+
+                    <button class="key key-func" data-action="sign" aria-label="Toggle positive negative">±</button>
+                    <button class="key key-digit" data-digit="0">0</button>
+                    <button class="key key-digit" data-action="decimal" aria-label="Decimal point">.</button>
+                    <button class="key key-equals" data-action="equals" aria-label="Equals">=</button>
+                </div>
+            </div>
+        </section>
+
+        <p class="keyboard-hint">
+            <i data-lucide="keyboard" class="icon-xs"></i>
+            Full keyboard support - numbers, <kbd>+</kbd> <kbd>−</kbd> <kbd>×</kbd> <kbd>/</kbd>, <kbd>Enter</kbd> to
+            equal, <kbd>Esc</kbd> to clear
+        </p>
+    </main>
+
+    <script src="script.js"></script>
+</body>
+
+</html>
